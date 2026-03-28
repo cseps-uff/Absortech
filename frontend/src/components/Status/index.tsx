@@ -53,18 +53,14 @@ export default function Status() {
         
         return (
           <div key={index} className={styles.container}>
-            <p className={styles.text1}>Andar {item.andar}</p>
-            <div className={styles.statusDiv}>
+            <div>
+              <p className={styles.text1}>Andar {item.andar}</p>
               <p className={styles.text2}>
                 {quantidadeAbsorventes > 3 ? "• Condição estável" : "• Alerta"} -{" "}
                 {quantidadeAbsorventes} absorvente{quantidadeAbsorventes !== 1 ? "s" : ""}
               </p>
-              <div
-                className={
-                  quantidadeAbsorventes >= 3 ? styles.greenSignal : styles.redSignal
-                }
-              />
             </div>
+            <div className={quantidadeAbsorventes >= 3 ? styles.greenSignal : styles.redSignal} />
           </div>
         );
       })}
