@@ -7,6 +7,8 @@
 #define uS_TO_MINUTE_FACTOR 60000000
 #define ANDAR 1
 
+
+bool debug = false;
 // Configurações de Wi-Fi
 const char* ssid = "nomeWifi";
 const char* password = "SenhaWifi";
@@ -111,7 +113,10 @@ void loop() {
 
   delay(300);
 
-  // COLOCA O ESP32 PARA ESPERAR (MODO DE ECONOMIA) PELA QUANTIDADE DE MINUTOS ESPECIFICADA
-  esp_sleep_enable_timer_wakeup(MINUTES_TO_SLEEP * uS_TO_MINUTE_FACTOR);
-  esp_deep_sleep_start();
+  if (!debug){  
+    // COLOCA O ESP32 PARA ESPERAR (MODO DE ECONOMIA) PELA QUANTIDADE DE MINUTOS ESPECIFICADA
+    esp_sleep_enable_timer_wakeup(MINUTES_TO_SLEEP * uS_TO_MINUTE_FACTOR);
+    esp_deep_sleep_start();
+  }
+
 }
