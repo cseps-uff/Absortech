@@ -70,7 +70,7 @@ export default function Home() {
           <div className={styles.textContent}>
             <h2>Metas e nossos 4 “idade”</h2>
             <p>
-              Um produto simples, prático, responsivo e escalável. Prático pela fácil instalação e baixa manutenção. Simples pelo visual limpo e elegante. Responsivo pela tecnologia eficiente. Escalável pelo uso de um sistema de comunicação otimizado e rápido entre contêineres.
+              Praticidade, simplicidade, responsividade e escalabilidade. Prático pela fácil instalação e baixa manutenção. Simples pelo visual limpo e elegante. Responsivo pela tecnologia eficiente. Escalável pelo uso de um sistema de comunicação otimizado e rápido entre contêineres.
             </p>
           </div>
         </div>
