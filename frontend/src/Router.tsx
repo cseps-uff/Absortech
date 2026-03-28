@@ -1,24 +1,19 @@
 import { useRoutes } from "react-router-dom";
 
-import Homepage from "src/pages/Homepage";
+import Layout from "src/components/Layout";
+
+import Home from "src/pages/Home";
 import Dashboard from "src/pages/Dashboard";
 
-const routes = [
-  {
-    path: "/",
-    children: [
-      {
-        index: true,
-        element: <Homepage />,
-      },
-      {
-        path: "dashboard",
-        element: <Dashboard />,
-      },
-    ],
-  },
-];
-
 export default function Router() {
-  return useRoutes(routes);
+  return useRoutes([
+    {
+      path: "/",
+      element: <Layout />,
+      children: [
+        { index: true, element: <Home /> },
+        { path: "dashboard", element: <Dashboard /> },
+      ],
+    },
+  ]);
 }

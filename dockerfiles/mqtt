@@ -1,0 +1,22 @@
+FROM python:3.11-slim
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    DJANGO_SETTINGS_MODULE=DjangoAbsortech.settings
+
+WORKDIR /app
+
+# Install system dependencies for PostgreSQL
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        libpq-dev \
+        gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY mqtt/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY mqtt/src ./src
+COPY backend ./backend
+
+CMD ["python", "src/run.py"]

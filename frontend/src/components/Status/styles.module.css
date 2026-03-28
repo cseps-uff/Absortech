@@ -1,48 +1,183 @@
-* {
-    padding: 0px;
-    margin: 0px;
-    box-sizing: border-box;
+.status {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
 }
 
 .container {
-    display: flex;
-    flex-direction: column;
-    align-content: space-between;
-    font-weight: bolder;
-    width: 700px;
-    gap: 20px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    column-gap: 22px;
+    row-gap: 12px;
+    width: 100%;
+    max-width: 800px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03));
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 16px;
+    padding: 24px 22px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    overflow-x: hidden;
+    box-shadow: 0 12px 34px rgba(15, 4, 30, 0.28);
 }
 
-.redSignal {
-    width: 60px;
-    height: 60px;
-    border-radius: 100%;
-    background-color: rgb(233, 39, 39);
-    border: rgb(136, 27, 27) solid 4px;
-    box-shadow: 5px 5px 10px #290850;
+.container:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 34px rgba(0, 0, 0, 0.32);
+    border-color: rgba(255, 212, 71, 0.52);
+}
+
+.text1 {
+    font-size: clamp(1.45rem, 3.6vw, 2rem);
+    font-weight: 800;
+    color: #FFFFFF;
+    margin-bottom: 2px;
+    text-align: left;
+    letter-spacing: 0.01em;
+    grid-column: 1 / 2;
 }
 
 .statusDiv {
     display: flex;
-    justify-content: space-between;
-}
-
-.text1 {
-    font-size: 60px;
-    width: fit-content;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 14px;
+    grid-column: 1 / 2;
 }
 
 .text2 {
-    font-size: 40px;
-    padding-left: 50px;
-    align-self: center;
+    font-size: clamp(0.98rem, 2.2vw, 1.08rem);
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    min-width: 0;
+    text-align: left;
+    line-height: 1.6;
 }
 
 .greenSignal {
     width: 60px;
     height: 60px;
-    border-radius: 100%;
+    border-radius: 50%;
     background-color: #36E94B;
-    border: #218f2e solid 4px;
-    box-shadow: 5px 5px 10px #290850;
+    border: 4px solid #218f2e;
+    box-shadow: 0 4px 15px rgba(54, 233, 75, 0.4), 0 0 20px rgba(54, 233, 75, 0.2);
+    flex-shrink: 0;
+    animation: pulse-green 2s infinite;
+}
+
+.redSignal {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: rgb(233, 39, 39);
+    border: 4px solid rgb(136, 27, 27);
+    box-shadow: 0 4px 15px rgba(233, 39, 39, 0.4), 0 0 20px rgba(233, 39, 39, 0.2);
+    flex-shrink: 0;
+    animation: pulse-red 2s infinite;
+    grid-column: 2 / 3;
+    grid-row: 1 / 3;
+}
+
+.greenSignal {
+    grid-column: 2 / 3;
+    grid-row: 1 / 3;
+}
+
+@keyframes pulse-green {
+
+    0%,
+    100% {
+        box-shadow: 0 4px 15px rgba(54, 233, 75, 0.4), 0 0 20px rgba(54, 233, 75, 0.2);
+    }
+
+    50% {
+        box-shadow: 0 4px 25px rgba(54, 233, 75, 0.6), 0 0 30px rgba(54, 233, 75, 0.4);
+    }
+}
+
+@keyframes pulse-red {
+
+    0%,
+    100% {
+        box-shadow: 0 4px 15px rgba(233, 39, 39, 0.4), 0 0 20px rgba(233, 39, 39, 0.2);
+    }
+
+    50% {
+        box-shadow: 0 4px 25px rgba(233, 39, 39, 0.6), 0 0 30px rgba(233, 39, 39, 0.4);
+    }
+}
+
+.loadingContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 20px;
+    font-size: 1.15rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 16px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .container {
+        grid-template-columns: 1fr auto;
+        padding: 20px 18px;
+        gap: 12px;
+    }
+
+    .text1 {
+        font-size: 1.5rem;
+    }
+
+    .statusDiv {
+        gap: 12px;
+    }
+
+    .text2 {
+        font-size: 1rem;
+    }
+
+    .greenSignal,
+    .redSignal {
+        width: 48px;
+        height: 48px;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        grid-template-columns: 1fr;
+        padding: 16px 14px;
+        row-gap: 8px;
+    }
+
+    .text1 {
+        font-size: 1.28rem;
+        margin-bottom: 2px;
+    }
+
+    .text2 {
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    .greenSignal,
+    .redSignal {
+        width: 40px;
+        height: 40px;
+        border-width: 3px;
+        grid-column: 1 / 2;
+        grid-row: auto;
+        justify-self: end;
+    }
+
+    .loadingContainer {
+        font-size: 1.02rem;
+        padding: 40px 15px;
+    }
 }

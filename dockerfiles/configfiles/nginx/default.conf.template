@@ -6,23 +6,39 @@ upstream django_api {
     server absortech-api:8000;
 }
 
-# 1. Redireciona tudo de HTTP para HTTPS
+# 1. Servidor HTTP (ACME + redirect)
 server {
     listen 80;
     server_name absortech.site;
 
-    return 301 https://absortech.site$request_uri;
+    # ACME challenge (CERTBOT)
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+        allow all;
+        try_files $uri =404;
+    }
+
+    # Redirect geral para HTTPS
+    location / {
+        return 301 https://absortech.site$request_uri;
+    }
 }
 
-# 2. Redireciona acessos diretos ao DNS da EC2 (HTTP)
+# 2. Redirect do DNS público da EC2 (HTTP)
 server {
     listen 80;
     server_name ec2-54-175-178-188.compute-1.amazonaws.com;
 
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+        allow all;
+        try_files $uri =404;
+    }
+
     return 301 https://absortech.site$request_uri;
 }
 
-# 3. Redireciona acessos diretos ao DNS da EC2 (HTTPS)
+# 3. Redirect do DNS público da EC2 (HTTPS)
 server {
     listen 443 ssl;
     server_name ec2-54-175-178-188.compute-1.amazonaws.com;
@@ -33,7 +49,7 @@ server {
     return 301 https://absortech.site$request_uri;
 }
 
-# 4. Servidor principal (HTTPS) para absortech.site
+# 4. Servidor principal HTTPS
 server {
     listen 443 ssl;
     server_name absortech.site;
@@ -41,14 +57,43 @@ server {
     ssl_certificate /etc/letsencrypt/live/absortech.site/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/absortech.site/privkey.pem;
 
-    proxy_connect_timeout 60s;
-    proxy_send_timeout 60s;
-    proxy_read_timeout 60s;
+    # Bloqueio de tentativas comuns de ataque
+    location ~* /(phpunit|vendor|composer\.json|composer\.lock|package\.json)$ {
+        deny all;
+    }
 
-    proxy_http_version 1.1;
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection "upgrade";
+    # Bloqueio de bots atrás do .env
+    location ~* \.env {
+        deny all;
+    }
 
+    # Bloqueio de arquivos ocultos
+    location ~ /\. {
+        deny all;
+    }
+
+    # Bloqueio de WordPress scanners
+    location ~* /(wp-admin|wp-login|wp-content|xmlrpc\.php|wlwmanifest\.xml)$ {
+        deny all;
+    }
+
+    # Arquivos estáticos (Django)
+    location /static/ {
+        alias /app/backend/staticfiles/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        access_log off;
+    }
+
+    # Media (se existir)
+    location /media/ {
+        alias /app/backend/media/;
+        expires 1y;
+        add_header Cache-Control "public";
+        access_log off;
+    }
+
+    # API Django
     location /api/ {
         proxy_pass http://django_api;
 
@@ -56,13 +101,11 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-Host $host;
-        proxy_redirect off;
 
-        proxy_set_header Content-Type $content_type;
-        proxy_set_header Content-Length $content_length;
+        proxy_redirect off;
     }
 
+    # Admin Django
     location /admin/ {
         proxy_pass http://django_api;
 
@@ -70,45 +113,16 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-Host $host;
-        proxy_redirect off;
     }
 
-    location /static/ {
-        proxy_pass http://django_api;
-
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_redirect off;
-
-        expires 1y;
-        add_header Cache-Control "public, immutable";
-    }
-
-    location /media/ {
-        proxy_pass http://django_api;
-
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_redirect off;
-
-        expires 1y;
-        add_header Cache-Control "public";
-    }
-
+    # Frontend React
     location / {
         proxy_pass http://react_app;
 
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_redirect off;
 
-        proxy_set_header Accept-Encoding "";
+        proxy_redirect off;
     }
 }

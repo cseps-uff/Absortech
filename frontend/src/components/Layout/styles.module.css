@@ -1,0 +1,245 @@
+.container {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ==================== HEADER ==================== */
+.topBarHeader {
+    background: linear-gradient(120deg, rgba(67, 10, 129, 0.92), rgba(47, 7, 92, 0.86));
+    backdrop-filter: blur(8px);
+    color: #fff;
+    padding: 14px 24px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 12px 26px rgba(23, 5, 47, 0.35);
+}
+
+.topBarLeft,
+.topBarRight {
+    display: flex;
+    align-items: center;
+}
+
+.topBarRight {
+    justify-content: flex-end;
+}
+
+.topBarLeft button {
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    color: #fff;
+    font-size: 0.98rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    padding: 0.56rem 0.95rem;
+    border-radius: 999px;
+    transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.topBarLeft button:hover {
+    background-color: rgba(255, 255, 255, 0.22);
+    transform: translateY(-1px);
+}
+
+.topBarCenterTitle {
+    font-size: clamp(1rem, 2vw, 1.35rem);
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.menuIcon {
+    width: 30px;
+    height: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    cursor: pointer;
+}
+
+.menuIcon div {
+    width: 100%;
+    height: 3px;
+    background-color: #fff;
+    transition: 0.3s;
+}
+
+/* ==================== FOOTER ==================== */
+.footer {
+    background: linear-gradient(180deg, rgba(67, 10, 129, 0.95), rgba(49, 8, 98, 0.98));
+    color: #fff;
+    padding: 36px 24px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    margin-top: auto;
+}
+
+.footerLeft,
+.footerCenter,
+.footerRight {
+    flex: 1;
+    min-width: 200px;
+    padding: 10px;
+}
+
+.footerLeft {
+    text-align: left;
+}
+
+.footerLeft p {
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.footerLeft a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footerLeft a:hover {
+    color: #fff;
+}
+
+.footerCenter {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.poweredByText {
+    font-size: 0.88rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.poweredByLogo {
+    max-width: 110px;
+    height: auto;
+    filter: brightness(0) invert(1);
+}
+
+.footerText {
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.footerRight {
+    text-align: right;
+}
+
+.socialIcons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.socialIcons a {
+    display: block;
+    width: 30px;
+    height: 30px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.socialIcons a:hover {
+    transform: translateY(-3px);
+    opacity: 0.85;
+}
+
+.socialIcons img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+}
+
+/* ==================== RESPONSIVIDADE ==================== */
+@media (max-width: 768px) {
+    .topBarHeader {
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+            "title title"
+            "left right";
+        row-gap: 10px;
+        padding: 12px 16px;
+    }
+
+    .topBarLeft {
+        grid-area: left;
+    }
+
+    .topBarRight {
+        grid-area: right;
+    }
+
+    .topBarCenterTitle {
+        grid-area: title;
+        font-size: 1rem;
+        margin-bottom: 2px;
+    }
+
+    .footer {
+        flex-direction: column;
+        padding: 25px 15px;
+        gap: 15px;
+    }
+
+    .footerLeft,
+    .footerCenter,
+    .footerRight {
+        min-width: unset;
+        width: 100%;
+        text-align: center;
+    }
+
+    .footerRight .socialIcons {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .topBarLeft button {
+        font-size: 0.92rem;
+        padding: 0.5rem 0.85rem;
+    }
+
+    .topBarCenterTitle {
+        font-size: 0.95rem;
+    }
+
+    .menuIcon {
+        width: 26px;
+        height: 20px;
+    }
+
+    .footer {
+        padding: 20px 15px;
+    }
+
+    .poweredByLogo {
+        max-width: 90px;
+    }
+
+    .socialIcons a {
+        width: 25px;
+        height: 25px;
+    }
+}

@@ -1,42 +1,63 @@
-.dashboardMainContent {
-  background: linear-gradient(to bottom, #7F51B0 0%, #430A81 60%, #430A81 100%);
-  padding: 80px 20px; /* Espaçamento interno (vertical e horizontal) */
-  min-height: 60vh; /* Altura mínima para preencher a tela */
+.dashboardSection {
+  width: 100%;
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: clamp(22px, 4vw, 40px) 16px clamp(34px, 5vw, 50px);
+}
+
+.headerBlock {
+  margin-bottom: clamp(18px, 3vw, 28px);
+  text-align: center;
+}
+
+.title {
+  color: #FFFFFF;
+  font-weight: 800;
+  font-size: clamp(1.75rem, 4.2vw, 2.85rem);
+  text-align: center;
+  letter-spacing: 0.02em;
+  text-shadow: 0 8px 24px rgba(0, 0, 0, 0.38);
+  margin-bottom: 8px;
+  line-height: 1.16;
+}
+
+.subtitle {
+  max-width: 760px;
+  margin: 0 auto;
+  font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+  color: rgba(255, 255, 255, 0.83);
+  line-height: 1.7;
+}
+
+.statusDiv {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 50px; /* Espaço entre o título e os contêineres */
+  gap: 22px;
   width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0;
 }
 
-/* Título principal da página */
-.title {
-  font-family: Arial, sans-serif; /* Usando a fonte padrão da homepage */
-  color: #FFFFFF; /* Cor do texto padrão */
-  font-weight: bold; /* 'bolder' pode variar, 'bold' é mais consistente */
-  font-size: 3em; /* Tamanho ajustado para ser impactante mas legível */
-  text-align: center;
-  letter-spacing: 2px;
-  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+@media (max-width: 1024px) {
+  .dashboardSection {
+    padding-top: 22px;
+  }
 }
 
-/* Container para os componentes de Status */
-.statusDiv {
-  display: flex;
-  flex-wrap: wrap; /* Permite que os itens quebrem para a próxima linha em telas menores */
-  justify-content: center; /* Centraliza os contêineres */
-  gap: 30px;
-  width: 100%;
-  max-width: 1200px; /* Limita a largura máxima para melhor visualização */
-}
-
-/* Media query para telas menores, como celulares */
 @media (max-width: 768px) {
-  .title {
-    font-size: 2.2em; /* Reduz o tamanho da fonte em telas menores */
+  .subtitle {
+    line-height: 1.55;
   }
 
-  .dashboardMainContent {
-    padding: 60px 15px;
+  .statusDiv {
+    gap: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .statusDiv {
+    gap: 14px;
   }
 }

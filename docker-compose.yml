@@ -40,6 +40,8 @@ services:
         condition: service_healthy
     networks:
       - absortech-network
+    volumes:
+      - static_data:/app/backend/staticfiles
     restart: unless-stopped
 
   absortech-app:
@@ -53,27 +55,6 @@ services:
       - absortech-network
     restart: unless-stopped
 
-  absortech-iot:
-    build:
-      context: ./
-      dockerfile: dockerfiles/iot
-    container_name: absortech-iot
-    environment:
-      DB_HOST: absortech-db
-      DB_NAME: ${POSTGRES_DB}
-      DB_USER: ${POSTGRES_USER}
-      DB_PASSWORD: ${POSTGRES_PASSWORD}
-      DB_PORT: ${POSTGRES_PORT}
-      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
-      DJANGO_DEBUG: ${DJANGO_DEBUG}
-      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
-    depends_on:
-      absortech-db:
-        condition: service_healthy
-    networks:
-      - absortech-network
-    restart: unless-stopped
-  
   absortech-nginx:
     build:
       context: ./
@@ -82,7 +63,9 @@ services:
     environment:
       - SERVER_NAME=${NGINX_SERVER_NAME}
     volumes:
+      - static_data:/app/backend/staticfiles:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/www/certbot:/var/www/certbot:ro
       - ./dockerfiles/configfiles/nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
       - ./dockerfiles/configfiles/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
@@ -95,8 +78,45 @@ services:
       - absortech-network
     restart: unless-stopped
 
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: mosquitto-mqtt-broker
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mqtt/mosquitto/config:/mosquitto/config
+      - ./mqtt/mosquitto/data:/mosquitto/data
+      - ./mqtt/mosquitto/log:/mosquitto/log
+    networks:
+      - absortech-network
+    restart: unless-stopped
+
+  absortech-mqtt:
+    build:
+      context: ./
+      dockerfile: dockerfiles/mqtt
+    container_name: absortech-mqtt
+    depends_on:
+      - mosquitto
+      - absortech-db
+    environment:
+      MQTT_HOST: mosquitto
+      DB_HOST: absortech-db
+      DB_NAME: ${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_PORT: ${POSTGRES_PORT}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+      DJANGO_DEBUG: ${DJANGO_DEBUG}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
+    networks:
+      - absortech-network
+    restart: unless-stopped
+
 volumes:
   postgres_data:
+  static_data:
 
 networks:
   absortech-network:

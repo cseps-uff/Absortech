@@ -1,0 +1,275 @@
+.container {
+    width: 100%;
+    position: relative;
+}
+
+.topImageSection {
+    min-height: clamp(440px, 72vh, 760px);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    text-align: center;
+    color: #fff;
+    position: relative;
+    padding: 20px;
+    overflow: hidden;
+}
+
+.heroImage {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 35%;
+    transform: scale(1.02);
+}
+
+.imageOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        linear-gradient(180deg, rgba(39, 8, 75, 0.2) 0%, rgba(49, 9, 95, 0.66) 56%, rgba(35, 6, 67, 0.86) 100%),
+        radial-gradient(circle at 20% 20%, rgba(255, 212, 71, 0.24), transparent 36%);
+    z-index: 1;
+}
+
+.topImageContent {
+    position: relative;
+    z-index: 2;
+    max-width: 920px;
+    width: 100%;
+    padding: 0 20px 12px;
+    animation: fadeUp 0.9s ease;
+}
+
+.topImageContent h1 {
+    font-size: clamp(2.4rem, 9vw, 5.4rem);
+    margin-bottom: 0.15em;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-shadow: 0 6px 22px rgba(0, 0, 0, 0.44);
+    line-height: 1;
+}
+
+.topImageContent p {
+    font-size: clamp(1rem, 3.2vw, 1.55rem);
+    margin-top: 0;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+}
+
+.textBlocksSection {
+    background: linear-gradient(180deg, rgba(67, 10, 129, 0.96) 0%, rgba(58, 10, 111, 0.96) 100%);
+    padding: clamp(44px, 8vw, 72px) 20px;
+}
+
+.textBlocksContainer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: clamp(16px, 2.8vw, 28px);
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.textBlock {
+    background-color: rgba(255, 255, 255, 0.11);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 16px;
+    padding: clamp(20px, 2.7vw, 30px);
+    flex: 1;
+    min-width: 260px;
+    max-width: 350px;
+    text-align: left;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    box-shadow: 0 10px 28px rgba(17, 4, 37, 0.22);
+}
+
+.textBlock:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 212, 71, 0.6);
+}
+
+.yellowSquare {
+    background-color: #ffd447;
+    min-width: 25px;
+    height: 25px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    box-shadow: 0 6px 16px rgba(255, 212, 71, 0.34);
+}
+
+.textBlockContent {
+    flex: 1;
+}
+
+.textBlockContent h2 {
+    font-size: clamp(1.25rem, 2.6vw, 1.68rem);
+    margin-bottom: 10px;
+    color: #fff;
+    line-height: 1.2;
+}
+
+.textBlockContent p {
+    font-size: 1rem;
+    line-height: 1.68;
+    color: rgba(255, 255, 255, 0.84);
+}
+
+.mainContentSection {
+    background: linear-gradient(180deg, rgba(127, 81, 176, 0.2) 0%, rgba(67, 10, 129, 0.9) 34%, rgba(49, 8, 98, 0.95) 100%);
+    padding: clamp(50px, 8vw, 82px) 0;
+}
+
+.mainContentContainer {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.contentFlex {
+    display: grid;
+    grid-template-columns: minmax(270px, 1fr) minmax(320px, 1.1fr);
+    align-items: center;
+    gap: clamp(20px, 4vw, 48px);
+    margin-bottom: 8px;
+    animation: fadeUp 0.8s ease;
+}
+
+.reverse {
+    grid-template-columns: minmax(320px, 1.1fr) minmax(270px, 1fr);
+}
+
+.featureImageWrapper {
+    width: 100%;
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(14, 3, 29, 0.4);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.featureImage {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    object-position: center;
+}
+
+.featureCaption {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    line-height: 1.4;
+    color: #fff;
+    background: rgba(22, 5, 43, 0.76);
+    backdrop-filter: blur(2px);
+}
+
+.text-content {
+    flex: 1;
+}
+
+.textContent {
+    color: rgba(255, 255, 255, 0.84);
+}
+
+.textContent h2 {
+    font-size: clamp(1.6rem, 4.4vw, 2.35rem);
+    margin-bottom: 14px;
+    color: #fff;
+    line-height: 1.2;
+}
+
+.textContent p {
+    font-size: clamp(1rem, 2.2vw, 1.1rem);
+    line-height: 1.75;
+}
+
+@media (max-width: 1024px) {
+    .textBlock {
+        min-width: 250px;
+        max-width: 320px;
+    }
+}
+
+@media (max-width: 768px) {
+    .topImageSection {
+        min-height: 62vh;
+        justify-content: flex-end;
+    }
+
+    .textBlocksContainer {
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+    }
+
+    .textBlock {
+        width: 100%;
+        max-width: none;
+    }
+
+    .contentFlex,
+    .reverse {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .textContent {
+        text-align: center;
+    }
+
+    .featureImage {
+        aspect-ratio: 4 / 3;
+    }
+}
+
+@media (max-width: 480px) {
+    .topImageSection {
+        min-height: 56vh;
+        padding: 12px;
+    }
+
+    .textBlockContent h2 {
+        font-size: 1.3rem;
+    }
+
+    .textBlockContent p {
+        font-size: 0.94rem;
+    }
+
+    .featureCaption {
+        font-size: 0.78rem;
+    }
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
