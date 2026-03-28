@@ -3,7 +3,7 @@
 #include <Ultrasonic.h>
 #include <ArduinoJson.h>
 
-#define MINUTES_TO_SLEEP    10
+#define MINUTES_TO_SLEEP    360
 #define uS_TO_MINUTE_FACTOR 60000000
 #define ANDAR 1
 
