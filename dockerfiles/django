@@ -38,6 +38,7 @@ COPY backend/ /app/backend
 COPY dockerfiles/configfiles/django/entrypoint.sh /entrypoint.sh
 
 RUN mkdir -p /app/backend/staticfiles && \
+    sed -i 's/\r$//' /entrypoint.sh && \
     chmod +x /entrypoint.sh && \
     chown -R django:django /app
 
@@ -45,4 +46,4 @@ USER django
 WORKDIR /app/backend
 
 EXPOSE 8000
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/bin/sh", "/entrypoint.sh"]
