@@ -1,5 +1,5 @@
 app = "absortech-mqtt-worker"
-primary_region = "gig"
+primary_region = "gru"
 
 [build]
   dockerfile = "../../dockerfiles/mqtt"

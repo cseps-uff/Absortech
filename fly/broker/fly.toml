@@ -1,5 +1,5 @@
 app = "absortech-broker"
-primary_region = "gig"
+primary_region = "gru"
 
 [build]
   dockerfile = "../../dockerfiles/broker"
