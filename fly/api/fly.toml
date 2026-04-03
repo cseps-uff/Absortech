@@ -2,7 +2,7 @@ app = "absortech-api"
 primary_region = "gig"
 
 [build]
-  dockerfile = "dockerfiles/django"
+  dockerfile = "../../dockerfiles/django"
 
 [env]
   DJANGO_SETTINGS_MODULE = "DjangoAbsortech.settings"

@@ -2,7 +2,7 @@ app = "absortech-mqtt-worker"
 primary_region = "gig"
 
 [build]
-  dockerfile = "dockerfiles/mqtt"
+  dockerfile = "../../dockerfiles/mqtt"
 
 [env]
   DJANGO_SETTINGS_MODULE = "DjangoAbsortech.settings"
