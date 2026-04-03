@@ -5,9 +5,10 @@ primary_region = "gru"
   dockerfile = "../../dockerfiles/mqtt"
 
 [env]
-  DJANGO_SETTINGS_MODULE = "DjangoAbsortech.settings"
-  DJANGO_DEBUG = "False"
-  DB_PORT = "5432"
+  DB_HOST = "absortech-db.internal"
+  DB_NAME = "postgres"
+  DB_USER = "postgres"
+  DB_PORT = "5433"
   MQTT_PORT = "1883"
 
 [processes]
