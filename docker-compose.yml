@@ -50,7 +50,7 @@ services:
       dockerfile: dockerfiles/nginx
     container_name: absortech-nginx
     environment:
-      - SERVER_NAME=${NGINX_SERVER_NAME}
+      - NGINX_HOST=${NGINX_HOST}
     volumes:
       - static_data:/app/backend/staticfiles:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
