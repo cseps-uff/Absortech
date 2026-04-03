@@ -6,11 +6,12 @@ primary_region = "gru"
 
 [env]
   DJANGO_SETTINGS_MODULE = "DjangoAbsortech.settings"
-  DB_NAME = "AbsortechDB"
-  DB_USER = "admin"
   DJANGO_DEBUG = "False"
   DJANGO_ALLOWED_HOSTS = "absortech.site"
-  DB_PORT = "5432"
+  DB_HOST = "absortech-db.internal"
+  DB_NAME = "postgres"
+  DB_USER = "postgres"
+  DB_PORT = "5433"
 
 [http_service]
   internal_port = 8000
