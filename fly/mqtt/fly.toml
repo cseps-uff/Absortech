@@ -4,13 +4,6 @@ primary_region = "gru"
 [build]
   dockerfile = "../../dockerfiles/mqtt"
 
-[env]
-  DB_HOST = "absortech-db.internal"
-  DB_NAME = "postgres"
-  DB_USER = "postgres"
-  DB_PORT = "5433"
-  MQTT_PORT = "1883"
-
 [processes]
   app = "python src/run.py"
 

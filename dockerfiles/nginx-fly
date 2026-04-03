@@ -1,0 +1,5 @@
+FROM nginx:1.27-alpine
+
+COPY dockerfiles/configfiles/nginx/gateway.fly.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 8080
