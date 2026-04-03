@@ -40,6 +40,10 @@ ESSENTIAL_HOSTS = [
     '0.0.0.0',
 ]
 
+fly_app_name = os.getenv('FLY_APP_NAME', '').strip()
+if fly_app_name:
+    ESSENTIAL_HOSTS.append(f'{fly_app_name}.fly.dev')
+
 ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS if host.strip()]
 
 for host in ESSENTIAL_HOSTS:
@@ -66,8 +70,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -175,6 +180,15 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]  # Diretório global de arquivos estáticos
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
