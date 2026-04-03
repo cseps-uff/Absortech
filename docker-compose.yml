@@ -44,6 +44,17 @@ services:
       - static_data:/app/backend/staticfiles
     restart: unless-stopped
 
+  absortech-app:
+    build:
+      context: ./
+      dockerfile: dockerfiles/node
+    container_name: absortech-app
+    expose:
+      - "3000"
+    networks:
+      - absortech-network
+    restart: unless-stopped
+
   absortech-nginx:
     build:
       context: ./
@@ -62,6 +73,7 @@ services:
       - "443:443"
     depends_on:
       - absortech-api
+      - absortech-app
     networks:
       - absortech-network
     restart: unless-stopped
