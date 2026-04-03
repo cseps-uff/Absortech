@@ -1,0 +1,29 @@
+app = "absortech-broker"
+primary_region = "gig"
+
+[build]
+  dockerfile = "dockerfiles/broker"
+
+[http_service]
+  internal_port = 9001
+  force_https = false
+  auto_start_machines = true
+  auto_stop_machines = "off"
+  min_machines_running = 1
+  processes = ["app"]
+
+[[services]]
+  internal_port = 1883
+  protocol = "tcp"
+  auto_start_machines = true
+  auto_stop_machines = "off"
+  min_machines_running = 1
+  processes = ["app"]
+
+  [[services.ports]]
+    port = 1883
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 256

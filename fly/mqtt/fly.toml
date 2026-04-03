@@ -1,0 +1,19 @@
+app = "absortech-mqtt-worker"
+primary_region = "gig"
+
+[build]
+  dockerfile = "dockerfiles/mqtt"
+
+[env]
+  DJANGO_SETTINGS_MODULE = "DjangoAbsortech.settings"
+  DJANGO_DEBUG = "False"
+  DB_PORT = "5432"
+  MQTT_PORT = "1883"
+
+[processes]
+  app = "python src/run.py"
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 512

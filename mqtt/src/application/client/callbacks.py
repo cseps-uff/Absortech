@@ -29,7 +29,7 @@ def on_message(client, user_data, message):
     try:
         now = timezone.now()
 
-        # Decoding JSON data
+        # Decoding dos dados JSON
         payload = json.loads(payload_str)
         measure = payload["measure"]
         floor = payload["andar"]
@@ -63,7 +63,7 @@ def on_message(client, user_data, message):
         print(f"Absorventes restantes: {absorventes_restantes}")
         print("===========================")
 
-        # Creating object with JSON data
+        # Cria um objeto com dados JSON
         leitura = LeituraSensor(
             data=now.date(),
             hora=now.time(),
@@ -71,7 +71,7 @@ def on_message(client, user_data, message):
             valor_leitura=absorventes_restantes
         )
 
-        # Saving to database
+        # Salva no banco de dados
         leitura.save()
 
         print(f"Data saved to database -> Date: {leitura.data}, Time: {leitura.hora}, "

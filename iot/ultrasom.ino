@@ -86,13 +86,11 @@ void loop() {
   if (!client.connected())
     reconnect();
 
-  //Le as informacoes do sensor, em cm e pol
   float cmMsec;
   long microsec = ultrasonic.timing();
   
   cmMsec = ultrasonic.convert(microsec, Ultrasonic::CM);
 
-  //Exibe informacoes no serial monitor
   Serial.print("Distancia em cm: ");
   Serial.print(cmMsec);
 

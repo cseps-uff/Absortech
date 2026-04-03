@@ -1,7 +1,3 @@
-upstream react_app {
-    server absortech-app:3000;
-}
-
 upstream django_api {
     server absortech-api:8000;
 }
@@ -115,14 +111,10 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    # Frontend React
+    # Frontend React (SPA estática)
     location / {
-        proxy_pass http://react_app;
-
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-Proto $scheme;
-
-        proxy_redirect off;
+        root /usr/share/nginx/html;
+        index index.html;
+        try_files $uri $uri/ /index.html;
     }
 }
