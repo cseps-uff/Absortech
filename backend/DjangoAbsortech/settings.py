@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import environ
 import os
+from urllib.parse import parse_qs, urlparse
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,7 +28,7 @@ environ.Env.read_env(os.path.join(BASE_DIR.parent, '.env'))
 SECRET_KEY = env('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env('DJANGO_DEBUG')
+DEBUG = env.bool('DJANGO_DEBUG')
 
 ALLOWED_HOSTS = env('DJANGO_ALLOWED_HOSTS').split(',')
 
@@ -102,19 +103,40 @@ WSGI_APPLICATION = 'DjangoAbsortech.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('DB_NAME'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('DB_PASSWORD'),
-        'HOST': env('DB_HOST'),
-        'PORT': env('DB_PORT', default='5432'),
-        'OPTIONS': {
-            'sslmode': 'prefer',
-        },
+database_url = env('DATABASE_URL', default='').strip()
+
+if database_url:
+    parsed_database_url = urlparse(database_url)
+    db_query_params = parse_qs(parsed_database_url.query)
+    db_sslmode = db_query_params.get('sslmode', [env('DB_SSLMODE', default='prefer')])[0]
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': parsed_database_url.path.lstrip('/') or 'postgres',
+            'USER': parsed_database_url.username or '',
+            'PASSWORD': parsed_database_url.password or '',
+            'HOST': parsed_database_url.hostname or '',
+            'PORT': str(parsed_database_url.port or 5432),
+            'OPTIONS': {
+                'sslmode': db_sslmode,
+            },
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': env('DB_NAME'),
+            'USER': env('DB_USER'),
+            'PASSWORD': env('DB_PASSWORD'),
+            'HOST': env('DB_HOST'),
+            'PORT': env('DB_PORT', default='5432'),
+            'OPTIONS': {
+                'sslmode': 'prefer',
+            },
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
