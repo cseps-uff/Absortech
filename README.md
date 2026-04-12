@@ -83,6 +83,6 @@ Still in the making! Meanwhile, enjoy these preview images
 
 ## Contributors
 
-<a href="https://github.com/gaabpng/Absortech/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=gaabpng/Absortech" />
+<a href="https://github.com/cseps-uff/Absortech/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=cseps-uff/Absortech" />
 </a>
