@@ -130,14 +130,30 @@ if database_url:
     }
 else:
     # Support both DB_* and POSTGRES_* variable names (e.g., Railway uses POSTGRES_*)
+    # Try DB_NAME first, fallback to POSTGRES_DB; same for other variables
+    db_name = env('DB_NAME', default=None) or env('POSTGRES_DB', default=None)
+    db_user = env('DB_USER', default=None) or env('POSTGRES_USER', default=None)
+    db_password = env('DB_PASSWORD', default=None) or env('POSTGRES_PASSWORD', default=None)
+    db_host = env('DB_HOST', default=None) or env('POSTGRES_HOST', default=None)
+    db_port = env('DB_PORT', default=None) or env('POSTGRES_PORT', default='5432')
+    
+    if not all([db_name, db_user, db_password, db_host]):
+        from django.core.exceptions import ImproperlyConfigured
+        raise ImproperlyConfigured(
+            'Database not properly configured. Either provide DATABASE_URL, or set these env vars:\n'
+            '  DB_NAME (or POSTGRES_DB), DB_USER (or POSTGRES_USER),\n'
+            '  DB_PASSWORD (or POSTGRES_PASSWORD), DB_HOST (or POSTGRES_HOST),\n'
+            '  DB_PORT (or POSTGRES_PORT, default 5432)'
+        )
+    
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': env('DB_NAME', default=env('POSTGRES_DB', default='')),
-            'USER': env('DB_USER', default=env('POSTGRES_USER', default='')),
-            'PASSWORD': env('DB_PASSWORD', default=env('POSTGRES_PASSWORD', default='')),
-            'HOST': env('DB_HOST', default=env('POSTGRES_HOST', default='')),
-            'PORT': env('DB_PORT', default=env('POSTGRES_PORT', default='5432')),
+            'NAME': db_name,
+            'USER': db_user,
+            'PASSWORD': db_password,
+            'HOST': db_host,
+            'PORT': db_port,
             'OPTIONS': {
                 'sslmode': 'prefer',
             },
