@@ -1,6 +1,8 @@
 # ─── build stage ───────────────────────────────────────────────────────
 FROM node:22.16-slim AS builder
 WORKDIR /app
+ARG VITE_API_HOST
+ENV VITE_API_HOST=${VITE_API_HOST}
 COPY frontend/package.json frontend/yarn.lock ./
 RUN yarn install --frozen-lockfile && yarn cache clean
 COPY frontend/ ./
