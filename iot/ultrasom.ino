@@ -130,5 +130,4 @@ void loop() {
     esp_sleep_enable_timer_wakeup(MINUTES_TO_SLEEP * uS_TO_MINUTE_FACTOR);
     esp_deep_sleep_start();
   }
-
 }
