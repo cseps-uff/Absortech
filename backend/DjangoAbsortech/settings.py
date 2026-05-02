@@ -129,14 +129,15 @@ if database_url:
         }
     }
 else:
+    # Support both DB_* and POSTGRES_* variable names (e.g., Railway uses POSTGRES_*)
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': env('DB_NAME'),
-            'USER': env('DB_USER'),
-            'PASSWORD': env('DB_PASSWORD'),
-            'HOST': env('DB_HOST'),
-            'PORT': env('DB_PORT', default='5432'),
+            'NAME': env('DB_NAME', default=env('POSTGRES_DB', default='')),
+            'USER': env('DB_USER', default=env('POSTGRES_USER', default='')),
+            'PASSWORD': env('DB_PASSWORD', default=env('POSTGRES_PASSWORD', default='')),
+            'HOST': env('DB_HOST', default=env('POSTGRES_HOST', default='')),
+            'PORT': env('DB_PORT', default=env('POSTGRES_PORT', default='5432')),
             'OPTIONS': {
                 'sslmode': 'prefer',
             },
