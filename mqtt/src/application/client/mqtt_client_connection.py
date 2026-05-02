@@ -1,3 +1,4 @@
+import os
 import paho.mqtt.client as mqtt
 from .callbacks import on_connect, on_subscribe, on_message
 
@@ -18,6 +19,16 @@ class MQTTClientConnection:
             client_id=self.__client_name,
             callback_api_version=mqtt.CallbackAPIVersion.VERSION1
         )
+
+        # Optional auth/TLS from environment for managed brokers (e.g., EMQX Cloud)
+        mqtt_user = os.getenv('MQTT_USER', '')
+        mqtt_pass = os.getenv('MQTT_PASS', '')
+        if mqtt_user or mqtt_pass:
+            mqtt_client.username_pw_set(mqtt_user, mqtt_pass)
+
+        mqtt_tls = os.getenv('MQTT_TLS', 'false').lower() in ('1', 'true', 'yes')
+        if mqtt_tls:
+            mqtt_client.tls_set()
 
         print("New connection started", self.__client_name)
         print("Broker ip", self.__broker_ip)
