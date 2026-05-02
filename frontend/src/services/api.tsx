@@ -1,13 +1,12 @@
 import axios from "axios";
 
 const { protocol, hostname, port } = window.location;
-export const baseURL = `${protocol}//${hostname}${port ? `:${port}` : ''}/api`;
+const envApiHost = import.meta.env.VITE_API_HOST || import.meta.env.API_HOST;
+export const baseURL = envApiHost || `${protocol}//${hostname}${port ? `:${port}` : ''}/api`;
 
 const api = axios.create({
     baseURL,
-    headers: {
-        "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" }
 });
 
 export const fetchLeituras = async () => {
