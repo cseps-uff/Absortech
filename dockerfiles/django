@@ -42,6 +42,12 @@ RUN mkdir -p /app/backend/staticfiles && \
     chmod +x /entrypoint.sh && \
     chown -R django:django /app
 
+# Fallback: Railway may set a start command pointing to /app/backend/entrypoint/cmd.
+# Create that path as a wrapper to /entrypoint.sh
+RUN mkdir -p /app/backend/entrypoint && \
+    cp /entrypoint.sh /app/backend/entrypoint/cmd && \
+    chmod +x /app/backend/entrypoint/cmd
+
 USER django
 WORKDIR /app/backend
 
