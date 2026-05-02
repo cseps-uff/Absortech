@@ -2,6 +2,7 @@
 #include <PubSubClient.h>
 #include <Ultrasonic.h>
 #include <ArduinoJson.h>
+#include <math.h>
 
 #define MINUTES_TO_SLEEP    360
 #define uS_TO_MINUTE_FACTOR 60000000
@@ -18,6 +19,8 @@ const char *mqtt_server = "broker.hivemq.com";
 const int mqtt_port = 1883;
 const char *mqtt_topic = "SENSOR/ULTRASSOM";
 
+const float MIN_DIFF_CM = 0.5f;
+
 // Criação dos objetos WiFi e MQTT
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -28,6 +31,9 @@ PubSubClient client(espClient);
 
 //Inicializa o sensor nos pinos definidos acima
 Ultrasonic ultrasonic(pino_trigger, pino_echo);
+
+RTC_DATA_ATTR float last_value_readed = NAN;
+RTC_DATA_ATTR bool has_last_value = false;
 
 // Função para conectar ao Wi-Fi
 void setup_wifi() {
@@ -83,31 +89,39 @@ void setup() {
 StaticJsonDocument<128> doc;
 
 void loop() {
-  if (!client.connected())
-    reconnect();
-
   float cmMsec;
   long microsec = ultrasonic.timing();
   
   cmMsec = ultrasonic.convert(microsec, Ultrasonic::CM);
 
+  bool should_send = !has_last_value || (fabsf(cmMsec - last_value_readed) > MIN_DIFF_CM);
+  last_value_readed = cmMsec;
+  has_last_value = true;
+
   Serial.print("Distancia em cm: ");
   Serial.print(cmMsec);
 
-  // GUARDA AS INFORMAÇÕES NO OBJETO JSON
-  doc["measure"] = cmMsec;
-  doc["andar"] = ANDAR;
+  if (should_send) {
+    if (!client.connected())
+      reconnect();
 
-  // TRANSFORMA O OBJETO JSON EM UMA STRING PARA SER ENVIADA
-  String jsonOutput;
-  serializeJson(doc, jsonOutput);
+    // GUARDA AS INFORMAÇÕES NO OBJETO JSON
+    doc["measure"] = cmMsec;
+    doc["andar"] = ANDAR;
 
-  Serial.print("\nPublicando: ");
-  Serial.println(jsonOutput);
+    // TRANSFORMA O OBJETO JSON EM UMA STRING PARA SER ENVIADA
+    String jsonOutput;
+    serializeJson(doc, jsonOutput);
 
-  // PUBLICA OS DADOS DO SENSOR
-  client.publish(mqtt_topic, jsonOutput.c_str());
-  client.loop();
+    Serial.print("\nPublicando: ");
+    Serial.println(jsonOutput);
+
+    // PUBLICA OS DADOS DO SENSOR
+    client.publish(mqtt_topic, jsonOutput.c_str());
+    client.loop();
+  } else {
+    Serial.print("\nValor muito proximo do ultimo. MQTT nao conectou.");
+  }
 
   delay(300);
 
