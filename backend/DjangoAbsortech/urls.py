@@ -22,7 +22,7 @@ from app import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/leituras/', views.obter_leituras, name='obter_leituras'), # GET para Frontend
+    path('api/leituras/', views.obter_status_atual_dispensers, name='obter_status_atual_dispensers'), # GET para Frontend
     path('api/leituras/endpoint_esp/', views.endpoint_leituras_esp32, name='endpoint_leituras_esp32'), # POST para o ESP32
 ]
 
