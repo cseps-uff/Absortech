@@ -7,32 +7,40 @@ from .serializers import LeituraSensorSerializer
 from rest_framework import status
 
 @api_view(['GET'])
-def obter_leituras(request):
-    connection.close()  # Fecha a conexão para garantir que busque dados novos
+def obter_status_atual_dispensers(request):
+    """
+    Retorna a última leitura de cada dispenser cadastrado,
+    alimentando os cards e gráficos em tempo real do Frontend.
+    """
+    connection.close()
 
-    # Busca as leituras cujo ID é o maior de cada andar (último registro inserido)
-    leituras_recentes = (
+    # Busca as leituras cujo ID é o maior para cada dispenser
+    ultimas_leituras = (
         LeituraSensor.objects
         .filter(id__in=Subquery(
             LeituraSensor.objects
-            .values('andar')
+            .values('dispenser')  # Agrupa por dispenser, não mais por andar livre
             .annotate(max_id=Max('id'))
             .values('max_id')
         ))
-        .order_by('andar')
+        .order_by('dispenser__andar')  # Ordena o resultado pelo andar mapeado no Dispenser
     )
 
-    # Serializa e retorna a resposta
-    serializer = LeituraSensorSerializer(leituras_recentes, many=True)
-    return Response(serializer.data)
+    serializer = LeituraSensorSerializer(ultimas_leituras, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
-def receber_leitura(request):
+def endpoint_leituras_esp32(request):
     """
     Endpoint para o ESP32 enviar novas leituras via HTTPS POST.
-    Payload esperado: {"andar": "3º Andar", "valor_leitura": 12.50}
+    Payload esperado:
+    {
+        "dispenser": 1,
+        "distancia_cm": 12.50
+    }
     """
     serializer = LeituraSensorSerializer(data=request.data)
+    
     if serializer.is_valid():
         serializer.save() # Salva direto no PostgreSQL
         return Response(
