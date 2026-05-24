@@ -1,3 +1,6 @@
 from django.contrib import admin
+from .models import Dispenser, LeituraSensor
 
-# Register your models here.
+# Registra os modelos para que eles apareçam no painel visual
+admin.site.register(Dispenser)
+admin.site.register(LeituraSensor)
