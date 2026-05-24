@@ -1,5 +1,17 @@
 from django.db import models
 
+class Dispenser(models.Model):
+    nome = models.CharField(max_length=100)
+    localização = models.CharField(max_length=255)
+    instituicao = models.CharField(max_length=100)
+    bloco = models.CharField(max_length=50)
+    andar = models.IntegerField()
+    ativo = models.BooleanField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.nome} - {self.instituicao} (Bloco {self.bloco}, {self.andar}º Andar)"
+    
 class LeituraSensor(models.Model):
     andar = models.CharField(max_length=50)
     data = models.DateField(auto_now_add=True)
