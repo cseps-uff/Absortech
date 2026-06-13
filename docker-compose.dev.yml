@@ -83,6 +83,8 @@ services:
       - ./mqtt/mosquitto/config:/mosquitto/config
       - ./mqtt/mosquitto/data:/mosquitto/data
       - ./mqtt/mosquitto/log:/mosquitto/log
+    networks:
+      - absortech-network
     restart: unless-stopped
 
   absortech-mqtt:

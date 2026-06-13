@@ -6,7 +6,7 @@
 
 #define MINUTES_TO_SLEEP    360
 #define uS_TO_MINUTE_FACTOR 60000000
-#define ANDAR 1
+#define DISPENSER_ID 1
 
 
 bool debug = false;
@@ -64,7 +64,8 @@ void reconnect() {
   while (!client.connected()) {
     Serial.print("Tentando conexão MQTT...");
 
-    if (client.connect("ESP32Client")) {
+    String clientId = "Absortech-" + String(DISPENSER_ID);
+    if (client.connect(clientId.c_str())) {
       Serial.println("conectado");
     } else {
       Serial.print("falha, rc=");
@@ -106,8 +107,8 @@ void loop() {
       reconnect();
 
     // GUARDA AS INFORMAÇÕES NO OBJETO JSON
-    doc["measure"] = cmMsec;
-    doc["andar"] = ANDAR;
+    doc["dispenser_id"] = DISPENSER_ID;
+    doc["distancia_cm"] = cmMsec;
 
     // TRANSFORMA O OBJETO JSON EM UMA STRING PARA SER ENVIADA
     String jsonOutput;
