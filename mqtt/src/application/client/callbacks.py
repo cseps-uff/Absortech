@@ -1,6 +1,6 @@
 import json
 from django.utils import timezone
-from app.models import LeituraSensor
+from app.models import LeituraSensor, Dispenser
 from src.config.broker_configs import mqtt_broker_configs
 
 
@@ -31,53 +31,85 @@ def on_message(client, user_data, message):
 
         # Decoding dos dados JSON
         payload = json.loads(payload_str)
-        measure = payload["measure"]
-        floor = payload["andar"]
+        distancia_cm = float(payload.get("measure", payload.get("distance", 0)))
+        
+        # Tentar obter dispenser_id do payload, ou usar floor como fallback
+        dispenser_id = payload.get("dispenser_id")
+        floor = payload.get("andar", payload.get("floor", "1"))
 
         print("========== DEBUG ==========")
         print(f"Raw message received: {message.payload}")
         print(f"Decoded JSON: {payload}")
         print(f"Floor received: {floor}")
-        print(f"Measure value received: {measure}")
+        print(f"Distance value received: {distancia_cm}")
+        print(f"Dispenser ID: {dispenser_id}")
         
         # Parâmetros para conversão
-        VALOR_MAXIMO = 3.35  # Valor quando a caixa está cheia (10 absorventes)
-        VALOR_MINIMO = 16.32  # Valor quando a caixa está vazia (0 absorventes)
-        ABSORVENTES_TOTAL = 10  # Capacidade máxima da caixa
+        MIN_CM = 2       # Distância quando está cheio (máxima leitura)
+        MAX_CM = 30      # Distância quando está vazio (mínima leitura)
         
         # Garantir que a medida está dentro dos limites esperados
-        measure_clamped = max(min(measure, VALOR_MINIMO), VALOR_MAXIMO)
+        distancia_clamped = max(min(distancia_cm, MAX_CM), MIN_CM)
         
-        # Converter valor do sensor para quantidade de absorventes
-        # Mapeamento linear inverso: valor menor = mais cheio
-        proporcao = (measure_clamped - VALOR_MINIMO) / (VALOR_MAXIMO - VALOR_MINIMO)
+        # Calcular porcentagem de ocupação
+        if distancia_clamped < MIN_CM:
+            porcentagem = 100.0
+        elif distancia_clamped > MAX_CM:
+            porcentagem = 0.0
+        else:
+            porcentagem = ((MAX_CM - distancia_clamped) / (MAX_CM - MIN_CM)) * 100
         
-        # Quantidade de absorventes (arredondado para inteiro)
-        absorventes_restantes = round(proporcao * ABSORVENTES_TOTAL)
+        porcentagem_ocupacao = round(porcentagem, 2)
         
-        # Garantir que fique entre 0 e 10
-        absorventes_restantes = max(0, min(ABSORVENTES_TOTAL, absorventes_restantes))
+        # Calcular quantidade estimada (capacidade máxima = 20 absorventes)
+        CAPACIDADE_MAXIMA = 20
+        quantidade_estimada = int((porcentagem / 100) * CAPACIDADE_MAXIMA)
         
-        print(f"Valor original do sensor: {measure}")
-        print(f"Valor limitado: {measure_clamped}")
-        print(f"Absorventes restantes: {absorventes_restantes}")
+        print(f"Distância original do sensor: {distancia_cm} cm")
+        print(f"Distância limitada: {distancia_clamped} cm")
+        print(f"Percentual de ocupação: {porcentagem_ocupacao}%")
+        print(f"Quantidade estimada: {quantidade_estimada}")
         print("===========================")
 
-        # Cria um objeto com dados JSON
+        # Buscar ou criar dispenser
+        if dispenser_id:
+            try:
+                dispenser = Dispenser.objects.get(id=dispenser_id, ativo=True)
+            except Dispenser.DoesNotExist:
+                print(f"Dispenser com ID {dispenser_id} não encontrado")
+                return
+        else:
+            # Se não houver dispenser_id, tentar buscar pelo andar ou criar um padrão
+            dispenser, _ = Dispenser.objects.get_or_create(
+                andar=int(floor) if floor.isdigit() else 1,
+                defaults={
+                    'nome': f'Dispenser Andar {floor}',
+                    'localização': f'Andar {floor}',
+                    'instituicao': 'Padrão',
+                    'bloco': 'Geral',
+                    'ativo': True
+                }
+            )
+
+        # Criar registro de leitura
         leitura = LeituraSensor(
-            data=now.date(),
-            hora=now.time(),
-            andar=floor,
-            valor_leitura=absorventes_restantes
+            timestamp=now,
+            dispenser=dispenser,
+            distancia_cm=distancia_clamped,
+            quantidade_estimada=quantidade_estimada,
+            porcentagem_ocupacao=porcentagem_ocupacao
         )
 
-        # Salva no banco de dados
+        # Salvar no banco de dados
         leitura.save()
 
-        print(f"Data saved to database -> Date: {leitura.data}, Time: {leitura.hora}, "
-              f"Floor: {leitura.andar}, Sensor Value: {leitura.valor_leitura}")
+        print(f"Data saved to database -> Timestamp: {leitura.timestamp}, "
+              f"Dispenser: {leitura.dispenser.nome}, Distance: {leitura.distancia_cm} cm, "
+              f"Quantity: {leitura.quantidade_estimada}, Occupancy: {leitura.porcentagem_ocupacao}%")
 
     except json.JSONDecodeError as error:
         print("Invalid JSON message!", error)
     except Exception as error:
         print("Error processing message:", error)
+        import traceback
+        traceback.print_exc()

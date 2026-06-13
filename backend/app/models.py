@@ -2,7 +2,7 @@ from django.db import models
 
 class Dispenser(models.Model):
     nome = models.CharField(max_length=100)
-    localização = models.CharField(max_length=255)
+    localizacao = models.CharField(max_length=255)
     instituicao = models.CharField(max_length=100)
     bloco = models.CharField(max_length=50)
     andar = models.IntegerField()
@@ -17,10 +17,13 @@ class LeituraSensor(models.Model):
     dispenser = models.ForeignKey(
         Dispenser, 
         on_delete=models.CASCADE, 
-        related_name='leituras'
+        related_name='leituras',
+        null=True,
+        blank=True
     )
+
     timestamp = models.DateTimeField(auto_now_add=True)  # Unificação de data + hora
-    distancia_cm = models.DecimalField(max_digits=6, decimal_places=2)
+    distancia_cm = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
     
     # Dados processados pelo Backend (calculados automaticamente antes de salvar)
     quantidade_estimada = models.IntegerField(blank=True, null=True)
