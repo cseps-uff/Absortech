@@ -1,5 +1,5 @@
 #include <WiFi.h>
-#include <PubSubClient.h>
+#include <HTTPClient.h> // ADIÇÃO: Biblioteca necessária para fazer requisições HTTP
 #include <Ultrasonic.h>
 #include <ArduinoJson.h>
 
@@ -11,20 +11,19 @@
 const char* ssid = "nomeWifi";
 const char* password = "SenhaWifi";
 
-// Configurações HTTPS
+// Configurações HTTPS - Nota: Adicionada a barra "/" no final para bater com o padrão do Django
 const char* server_url = "https://ec2-18-231-186-125.sa-east-1.compute.amazonaws.com/api/leituras/enviar/";
 
-//Define os pinos para o trigger e echo
+// Define os pinos para o trigger e echo
 #define pino_trigger 23
 #define pino_echo 22
 
-//Inicializa o sensor nos pinos definidos acima
+// Inicializa o sensor nos pinos definidos acima
 Ultrasonic ultrasonic(pino_trigger, pino_echo);
 
 // Função para conectar ao Wi-Fi
 void setup_wifi() {
   delay(10);
-
   Serial.println();
   Serial.print("Conectando-se a ");
   Serial.println(ssid);
@@ -42,50 +41,26 @@ void setup_wifi() {
   Serial.println(WiFi.localIP());
 }
 
-// Função de callback do MQTT (não será usada, mas precisa ser declarada)
-void callback(char* topic, byte* message, unsigned int length) {}
-
-// Função para conectar ao servidor MQTT
-void reconnect() {
-  while (!client.connected()) {
-    Serial.print("Tentando conexão MQTT...");
-
-    if (client.connect("ESP32Client")) {
-      Serial.println("conectado");
-    } else {
-      Serial.print("falha, rc=");
-      Serial.print(client.state());
-      Serial.println(" tentando novamente em 5 segundos");
-
-      delay(5000);
-    }
-  }
-}
-
 void setup() {
   Serial.begin(115200);
 
   setup_wifi();
 
-  client.setServer(mqtt_server, mqtt_port);
-  client.setCallback(callback);
-
-  //Le as informacoes do sensor, em cm e pol
-  float cmMsec;
+  // Le as informacoes do sensor, em cm
   long microsec = ultrasonic.timing();
-  
-  cmMsec = ultrasonic.convert(microsec, Ultrasonic::CM);
+  float cmMsec = ultrasonic.convert(microsec, Ultrasonic::CM);
 
-  //Exibe informacoes no serial monitor
+  // Exibe informacoes no serial monitor
   Serial.print("Distancia em cm: ");
-  Serial.print(cmMsec);
+  Serial.println(cmMsec);
 
-  if (Wifi.status() == WL_CONNECTED){
-    WifiClient client;
+  // CORREÇÃO: "WiFi" com 'Fi' maiúsculo para respeitar a biblioteca nativa
+  if (WiFi.status() == WL_CONNECTED){
+    WiFiClient client;
     HTTPClient http;
 
     http.begin(client, server_url);
-    http.addHeader("Content-Type", "application.json");
+    http.addHeader("Content-Type", "application/json");
 
     // GUARDA AS INFORMAÇÕES NO OBJETO JSON
     StaticJsonDocument<128> doc;
@@ -94,6 +69,9 @@ void setup() {
     
     String jsonOutput;
     serializeJson(doc, jsonOutput);
+
+    Serial.print("Enviando POST: ");
+    Serial.println(jsonOutput);
 
     // Executa o POST (Operação síncrona, aguarda resposta do Django)
     int httpResponseCode = http.POST(jsonOutput);
@@ -123,5 +101,5 @@ void setup() {
 }
 
 void loop() {
-  
+  // O loop fica vazio porque o Deep Sleep reinicia o chip direto no setup()
 }

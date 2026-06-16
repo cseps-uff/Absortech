@@ -20,10 +20,14 @@ from django.conf import settings
 from django.conf.urls.static import static
 from app import views
 
+# Arquivo: DjangoAbsortech/urls.py
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/leituras/', views.obter_leituras, name='obter_leituras'),
-    path('api/leituras/enviar', views.receber_leitura, name='receber_leitura')
+    
+    # CORREÇÃO: Adicionada a barra "/" no final da rota para evitar erros de redirecionamento 301/404
+    path('api/leituras/enviar/', views.receber_leitura, name='receber_leitura')
 ]
 
 if settings.DEBUG:
