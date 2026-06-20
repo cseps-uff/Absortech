@@ -75,6 +75,19 @@ In order to replicate this yourself, make sure you have an ESP32 and the HC-SR04
 
 When you run ultrasom.ino the distance (which is measured in cm) is correct and ajdust the empty/full calculations to whatever works best for you.
 
+Each ESP32 must be registered as a `Dispenser` in Django and configured with the
+corresponding `DISPENSER_ID` in `iot/ultrasom.ino`. The canonical MQTT payload is:
+
+```json
+{
+  "dispenser_id": 1,
+  "distancia_cm": 10.5
+}
+```
+
+The consumer still accepts the legacy `measure` and `andar` fields during the
+firmware transition, as long as the floor identifies exactly one active dispenser.
+
 ## Website
 
 Still in the making! Meanwhile, enjoy these preview images

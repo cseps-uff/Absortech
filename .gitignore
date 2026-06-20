@@ -17,6 +17,7 @@ ENV/
 
 # Database
 *.sqlite3
+/mqtt/mosquitto/data/
 
 # Static files generated (collected by collectstatic)
 staticfiles/
