@@ -1,46 +1,51 @@
-import logging
-
-from django.db.models import OuterRef, Subquery
-from rest_framework import status
-from rest_framework.decorators import api_view
+from django.db import connection
+from django.db.models import Max, Subquery
 from rest_framework.response import Response
-
+from rest_framework.decorators import api_view
 from .models import LeituraSensor
 from .serializers import LeituraSensorSerializer
-
-logger = logging.getLogger(__name__)
-
+from rest_framework import status
 
 @api_view(['GET'])
-def obter_leituras(request):
-    try:
-        leitura_mais_recente = (
-            LeituraSensor.objects
-            .filter(dispenser_id=OuterRef('dispenser_id'))
-            .order_by('-timestamp', '-id')
-            .values('id')[:1]
-        )
+def obter_status_atual_dispensers(request):
+    """
+    Retorna a última leitura de cada dispenser cadastrado,
+    alimentando os cards e gráficos em tempo real do Frontend.
+    """
+    connection.close()
 
-        leituras_recentes = (
+    # Busca as leituras cujo ID é o maior para cada dispenser
+    ultimas_leituras = (
+        LeituraSensor.objects
+        .filter(id__in=Subquery(
             LeituraSensor.objects
-            .filter(
-                dispenser__ativo=True,
-                id=Subquery(leitura_mais_recente)
-            )
-            .select_related('dispenser')
-            .order_by(
-                'dispenser__instituicao',
-                'dispenser__bloco',
-                'dispenser__andar',
-                'dispenser__nome'
-            )
-        )
+            .values('dispenser')  # Agrupa por dispenser, não mais por andar livre
+            .annotate(max_id=Max('id'))
+            .values('max_id')
+        ))
+        .order_by('dispenser__andar')  # Ordena o resultado pelo andar mapeado no Dispenser
+    )
 
-        serializer = LeituraSensorSerializer(leituras_recentes, many=True)
-        return Response(serializer.data)
-    except Exception:
-        logger.exception("Erro ao buscar leituras")
+    serializer = LeituraSensorSerializer(ultimas_leituras, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def endpoint_leituras_esp32(request):
+    """
+    Endpoint para o ESP32 enviar novas leituras via HTTPS POST.
+    Payload esperado:
+    {
+        "dispenser": 1,
+        "distancia_cm": 12.50
+    }
+    """
+    serializer = LeituraSensorSerializer(data=request.data)
+    
+    if serializer.is_valid():
+        serializer.save() # Salva direto no PostgreSQL
         return Response(
-            {'error': 'Nao foi possivel buscar as leituras.'},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            {"status": "sucesso", "dados": serializer.data}, 
+            status=status.HTTP_201_CREATED
         )
+    
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

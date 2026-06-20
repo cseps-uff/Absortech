@@ -67,3 +67,6 @@ migrations/*
 
 # Ignore all migrations except __init__.py
 !migrations/__init__.py
+backend/DjangoAbsortech/settings.py
+
+password-superuser.txt

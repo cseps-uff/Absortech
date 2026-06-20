@@ -22,11 +22,6 @@ class LeituraSensorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = LeituraSensor
-        fields = [
-            'id',
-            'dispenser',
-            'timestamp',
-            'distancia_cm',
-            'quantidade_estimada',
-            'porcentagem_ocupacao'
-        ]
+        fields = '__all__'
+        
+        read_only_fields = ['id', 'timestamp', 'quantidade_estimada', 'porcentagem_ocupacao']

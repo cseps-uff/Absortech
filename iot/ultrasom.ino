@@ -1,44 +1,29 @@
 #include <WiFi.h>
-#include <PubSubClient.h>
+#include <HTTPClient.h> // ADIÇÃO: Biblioteca necessária para fazer requisições HTTP
 #include <Ultrasonic.h>
 #include <ArduinoJson.h>
-#include <math.h>
 
-#define MINUTES_TO_SLEEP    360
+#define MINUTES_TO_SLEEP    10
 #define uS_TO_MINUTE_FACTOR 60000000
 #define DISPENSER_ID 1
 
-
-bool debug = false;
 // Configurações de Wi-Fi
 const char* ssid = "nomeWifi";
 const char* password = "SenhaWifi";
 
-// Configurações do MQTT
-const char *mqtt_server = "broker.hivemq.com";
-const int mqtt_port = 1883;
-const char *mqtt_topic = "SENSOR/ULTRASSOM";
+// Configurações HTTPS - Nota: Adicionada a barra "/" no final para bater com o padrão do Django
+const char* server_url = "https://ec2-18-231-186-125.sa-east-1.compute.amazonaws.com/api/leituras/enviar/";
 
-const float MIN_DIFF_CM = 0.5f;
-
-// Criação dos objetos WiFi e MQTT
-WiFiClient espClient;
-PubSubClient client(espClient);
-
-//Define os pinos para o trigger e echo
+// Define os pinos para o trigger e echo
 #define pino_trigger 23
 #define pino_echo 22
 
-//Inicializa o sensor nos pinos definidos acima
+// Inicializa o sensor nos pinos definidos acima
 Ultrasonic ultrasonic(pino_trigger, pino_echo);
-
-RTC_DATA_ATTR float last_value_readed = NAN;
-RTC_DATA_ATTR bool has_last_value = false;
 
 // Função para conectar ao Wi-Fi
 void setup_wifi() {
   delay(10);
-
   Serial.println();
   Serial.print("Conectando-se a ");
   Serial.println(ssid);
@@ -82,53 +67,67 @@ void setup() {
 
   setup_wifi();
 
-  client.setServer(mqtt_server, mqtt_port);
-  client.setCallback(callback);
-}
-
-// INICIALIZANDO UM OBJETO JSON
-StaticJsonDocument<128> doc;
-
-void loop() {
-  float cmMsec;
+  // Le as informacoes do sensor, em cm
   long microsec = ultrasonic.timing();
-  
-  cmMsec = ultrasonic.convert(microsec, Ultrasonic::CM);
+  float cmMsec = ultrasonic.convert(microsec, Ultrasonic::CM);
 
-  bool should_send = !has_last_value || (fabsf(cmMsec - last_value_readed) > MIN_DIFF_CM);
-  last_value_readed = cmMsec;
-  has_last_value = true;
-
+  // Exibe informacoes no serial monitor
   Serial.print("Distancia em cm: ");
-  Serial.print(cmMsec);
+  Serial.println(cmMsec);
 
-  if (should_send) {
-    if (!client.connected())
-      reconnect();
+  // CORREÇÃO: "WiFi" com 'Fi' maiúsculo para respeitar a biblioteca nativa
+  if (WiFi.status() == WL_CONNECTED){
+    WiFiClient client;
+    HTTPClient http;
+
+    http.begin(client, server_url);
+    http.addHeader("Content-Type", "application/json");
 
     // GUARDA AS INFORMAÇÕES NO OBJETO JSON
+<<<<<<< HEAD
+    StaticJsonDocument<128> doc;
+    doc["measure"] = cmMsec;
+    doc["andar"] = ANDAR;
+    
+=======
     doc["dispenser_id"] = DISPENSER_ID;
     doc["distancia_cm"] = cmMsec;
 
     // TRANSFORMA O OBJETO JSON EM UMA STRING PARA SER ENVIADA
+>>>>>>> main
     String jsonOutput;
     serializeJson(doc, jsonOutput);
 
-    Serial.print("\nPublicando: ");
+    Serial.print("Enviando POST: ");
     Serial.println(jsonOutput);
 
-    // PUBLICA OS DADOS DO SENSOR
-    client.publish(mqtt_topic, jsonOutput.c_str());
-    client.loop();
-  } else {
-    Serial.print("\nValor muito proximo do ultimo. MQTT nao conectou.");
+    // Executa o POST (Operação síncrona, aguarda resposta do Django)
+    int httpResponseCode = http.POST(jsonOutput);
+
+    if (httpResponseCode > 0) {
+      String response = http.getString();
+      Serial.print("Código de resposta HTTP: ");
+      Serial.println(httpResponseCode);
+      Serial.print("Resposta do servidor: ");
+      Serial.println(response);
+    } else {
+      Serial.print("Erro no envio do POST: ");
+      Serial.println(httpResponseCode);
+    }
+
+    // Encerra a conexão HTTP aberta
+    http.end();
   }
 
-  delay(300);
+  // Desconecta o Wi-Fi de forma limpa antes de dormir para poupar energia do roteador
+  WiFi.disconnect(true);
+  
+  // Imprime aviso final e entra em Deep Sleep por 10 minutos
+  Serial.println("Entrando em modo Deep Sleep...");
+  esp_sleep_enable_timer_wakeup(MINUTES_TO_SLEEP * uS_TO_MINUTE_FACTOR);
+  esp_deep_sleep_start();
+}
 
-  if (!debug){  
-    // COLOCA O ESP32 PARA ESPERAR (MODO DE ECONOMIA) PELA QUANTIDADE DE MINUTOS ESPECIFICADA
-    esp_sleep_enable_timer_wakeup(MINUTES_TO_SLEEP * uS_TO_MINUTE_FACTOR);
-    esp_deep_sleep_start();
-  }
+void loop() {
+  // O loop fica vazio porque o Deep Sleep reinicia o chip direto no setup()
 }
