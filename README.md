@@ -57,6 +57,7 @@ Moreover, Absortech will distribute these items free of charge, looking to help 
 To start the entire environment using Docker, run the following command:
 
 ```sh
+docker network create absortech-network
 docker compose -f docker-compose.dev.yml up -d --build
 ```
 

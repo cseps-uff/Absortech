@@ -19,7 +19,17 @@ from urllib.parse import parse_qs, urlparse
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env()
-environ.Env.read_env(os.path.join(BASE_DIR.parent, '.env'))
+
+ENV_FILES = (
+    BASE_DIR.parent / 'dev.env',
+    BASE_DIR.parent / '.env.dev',
+    BASE_DIR.parent / '.env',
+)
+
+for env_file in ENV_FILES:
+    if env_file.exists():
+        environ.Env.read_env(str(env_file))
+        break
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -32,17 +42,31 @@ DEBUG = env.bool('DJANGO_DEBUG')
 
 ALLOWED_HOSTS = env('DJANGO_ALLOWED_HOSTS').split(',')
 
+csrf_trusted_origins = [
+    origin.strip()
+    for origin in env('DJANGO_CSRF_TRUSTED_ORIGINS', default='').split(',')
+    if origin.strip()
+]
+
+if DEBUG:
+    csrf_trusted_origins.extend([
+        'http://localhost',
+        'http://localhost:3000',
+        'http://localhost:8000',
+        'http://127.0.0.1',
+        'http://127.0.0.1:3000',
+        'http://127.0.0.1:8000',
+    ])
+
+CSRF_TRUSTED_ORIGINS = tuple(dict.fromkeys(csrf_trusted_origins))
+
 ESSENTIAL_HOSTS = [
     'absortech-api',
     'django_api',
     'localhost',
     '127.0.0.1',
-    '0.0.0.0',
+    '0.0.0.0'
 ]
-
-fly_app_name = os.getenv('FLY_APP_NAME', '').strip()
-if fly_app_name:
-    ESSENTIAL_HOSTS.append(f'{fly_app_name}.fly.dev')
 
 ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS if host.strip()]
 
@@ -66,7 +90,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'app',
     'rest_framework',
-    'corsheaders',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
@@ -78,7 +102,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware'
 ]
 
 # CORS Configuration
@@ -97,10 +121,10 @@ TEMPLATES = [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
+                'django.contrib.messages.context_processors.messages'
+            ]
+        }
+    }
 ]
 
 WSGI_APPLICATION = 'DjangoAbsortech.wsgi.application'
@@ -124,8 +148,8 @@ if database_url:
             'HOST': parsed_database_url.hostname or '',
             'PORT': str(parsed_database_url.port or 5432),
             'OPTIONS': {
-                'sslmode': db_sslmode,
-            },
+                'sslmode': db_sslmode
+            }
         }
     }
 else:
@@ -155,8 +179,8 @@ else:
             'HOST': db_host,
             'PORT': db_port,
             'OPTIONS': {
-                'sslmode': 'prefer',
-            },
+                'sslmode': 'prefer'
+            }
         }
     }
 
@@ -165,50 +189,44 @@ else:
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'
+    }
 ]
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]  # Diretório global de arquivos estáticos
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]  # Diretório global de arquivos estáticos
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STORAGES = {
     'default': {
-        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+        'BACKEND': 'django.core.files.storage.FileSystemStorage'
     },
     'staticfiles': {
-        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
-    },
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    }
 }
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-

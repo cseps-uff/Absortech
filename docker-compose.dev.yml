@@ -12,7 +12,7 @@ services:
       - absortech-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -24,8 +24,13 @@ services:
     container_name: absortech-api
     env_file:
       - .env.dev
-    expose:
-      - "8000"
+    environment:
+      DB_HOST: absortech-db
+      DJANGO_RUNSERVER: "True"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app/backend
     depends_on:
       absortech-db:
         condition: service_healthy
@@ -37,28 +42,11 @@ services:
     build:
       context: ./
       dockerfile: dockerfiles/node
+      args:
+        VITE_API_HOST: ${VITE_API_HOST:-http://localhost:8000/api}
     container_name: absortech-app
-    expose:
-      - "3000"
-    networks:
-      - absortech-network
-    restart: unless-stopped
-
-  absortech-nginx:
-    build:
-      context: ./
-      dockerfile: dockerfiles/nginx
-    container_name: absortech-nginx
-    env_file:
-      - .env.dev
-    volumes:
-      - ./dockerfiles/configfiles/nginx/default.dev.conf.template:/etc/nginx/templates/default.conf.template:ro
-      - ./dockerfiles/configfiles/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
-      - "80:80"
-    depends_on:
-      - absortech-api
-      - absortech-app
+      - "3000:3000"
     networks:
       - absortech-network
     restart: unless-stopped
