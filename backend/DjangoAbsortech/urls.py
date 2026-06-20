@@ -20,14 +20,10 @@ from django.conf import settings
 from django.conf.urls.static import static
 from app import views
 
-# Arquivo: DjangoAbsortech/urls.py
-
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/leituras/', views.obter_leituras, name='obter_leituras'),
-    
-    # CORREÇÃO: Adicionada a barra "/" no final da rota para evitar erros de redirecionamento 301/404
-    path('api/leituras/enviar/', views.receber_leitura, name='receber_leitura')
+    path('api/leituras/', views.obter_status_atual_dispensers, name='obter_status_atual_dispensers'), # GET para Frontend
+    path('api/leituras/endpoint_esp/', views.endpoint_leituras_esp32, name='endpoint_leituras_esp32'), # POST para o ESP32
 ]
 
 if settings.DEBUG:
