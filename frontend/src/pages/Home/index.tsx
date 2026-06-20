@@ -96,15 +96,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* Emanuel caso vc ache importante ter o componente Status na Homepage, você pode colocá-lo aqui */}
-      {/* <section className={styles.statusSection}>
-          <h1 className={styles.title2}>Contêineres - Prédio de Engenharia</h1>
-          <div className={styles.statusDiv}>
-            <Status />
-          </div>
-      </section> */}
-
     </main>
   );
 }

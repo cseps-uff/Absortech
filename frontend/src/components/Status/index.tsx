@@ -2,24 +2,23 @@ import styles from "./styles.module.css";
 import { fetchLeituras } from "src/services/api";
 import { useQuery } from "react-query";
 
-interface Leitura {
-  andar: string;
-  data: string;
-  hora: string;
-  valor_leitura: number;
-}
+const LIMITE_ALERTA_QUANTIDADE = 3;
+
+const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
+  dateStyle: "short",
+  timeStyle: "short",
+});
 
 export default function Status() {
   const {
     data: leituras,
     isLoading,
     error,
-  } = useQuery<Leitura[]>("fetchLeituras", fetchLeituras, {
+  } = useQuery("fetchLeituras", fetchLeituras, {
     refetchInterval: 5000,
     retry: false
   });
 
-  // Show loading
   if (isLoading) {
     return (
       <div className={styles.loadingContainer}>
@@ -28,7 +27,6 @@ export default function Status() {
     );
   }
 
-  // Show error
   if (error) {
     return (
       <div className={styles.loadingContainer}>
@@ -37,31 +35,81 @@ export default function Status() {
     );
   }
 
-  // Show message if no readings available
-  if (!leituras || !Array.isArray(leituras) || leituras.length === 0) {
+  if (!leituras || leituras.length === 0) {
     return (
       <div className={styles.loadingContainer}>
-        <p>Não há dados disponíveis.</p>
+        <p>Nao ha dados disponiveis.</p>
       </div>
     );
   }
 
   return (
     <div className={styles.status}>
-      {leituras.map((item, index) => {
-        const quantidadeAbsorventes = Number(item.valor_leitura);
-        
+      {leituras.map((leitura) => {
+        const quantidade = leitura.quantidade_estimada;
+        const ocupacao = leitura.porcentagem_ocupacao;
+        const dispenser = leitura.dispenser;
+        const isAlert = quantidade === null || quantidade <= LIMITE_ALERTA_QUANTIDADE;
+        const nivel = Math.min(Math.max(ocupacao ?? 0, 0), 100);
+        const quantidadeLabel = quantidade === null
+          ? "Quantidade indisponivel"
+          : `${quantidade} absorvente${quantidade !== 1 ? "s" : ""}`;
+
         return (
-          <div key={index} className={styles.container}>
-            <div>
-              <p className={styles.text1}>Andar {item.andar}</p>
-              <p className={styles.text2}>
-                {quantidadeAbsorventes > 3 ? "• Condição estável" : "• Alerta"} -{" "}
-                {quantidadeAbsorventes} absorvente{quantidadeAbsorventes !== 1 ? "s" : ""}
-              </p>
+          <article
+            key={leitura.id}
+            className={`${styles.container} ${isAlert ? styles.alertCard : ""}`}
+          >
+            <header className={styles.cardHeader}>
+              <div>
+                <p className={styles.institution}>{dispenser.instituicao}</p>
+                <h2 className={styles.title}>{dispenser.nome}</h2>
+              </div>
+              <span className={`${styles.badge} ${isAlert ? styles.alertBadge : styles.stableBadge}`}>
+                <span className={styles.badgeDot} aria-hidden="true" />
+                {isAlert ? "Reposicao necessaria" : "Condicao estavel"}
+              </span>
+            </header>
+
+            <p className={styles.location}>
+              {dispenser.localizacao} - Bloco {dispenser.bloco} - {dispenser.andar}o andar
+            </p>
+
+            <div className={styles.metrics}>
+              <div className={styles.primaryMetric}>
+                <span className={styles.metricLabel}>Estoque estimado</span>
+                <strong>{quantidadeLabel}</strong>
+              </div>
+              <div className={styles.metric}>
+                <span className={styles.metricLabel}>Distancia</span>
+                <strong>{leitura.distancia_cm.toFixed(1)} cm</strong>
+              </div>
+              <div className={styles.metric}>
+                <span className={styles.metricLabel}>Ultima leitura</span>
+                <strong>{dateFormatter.format(new Date(leitura.timestamp))}</strong>
+              </div>
             </div>
-            <div className={quantidadeAbsorventes >= 3 ? styles.greenSignal : styles.redSignal} />
-          </div>
+
+            <div className={styles.levelSection}>
+              <div className={styles.levelHeader}>
+                <span>Nivel do dispenser</span>
+                <strong>{ocupacao === null ? "Indisponivel" : `${ocupacao.toFixed(1)}%`}</strong>
+              </div>
+              <div
+                className={styles.levelTrack}
+                role="meter"
+                aria-label={`Nivel de ${dispenser.nome}`}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={nivel}
+              >
+                <div
+                  className={`${styles.levelFill} ${isAlert ? styles.alertLevel : styles.stableLevel}`}
+                  style={{ width: `${nivel}%` }}
+                />
+              </div>
+            </div>
+          </article>
         );
       })}
     </div>

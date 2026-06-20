@@ -57,6 +57,7 @@ Moreover, Absortech will distribute these items free of charge, looking to help 
 To start the entire environment using Docker, run the following command:
 
 ```sh
+docker network create absortech-network
 docker compose -f docker-compose.dev.yml up -d --build
 ```
 
@@ -73,6 +74,17 @@ In order to replicate this yourself, make sure you have an ESP32 and the HC-SR04
 ![schematic_absortech](https://raw.githubusercontent.com/gaabpng/Absortech/refs/heads/main/assets/schematic_absortech.png)
 
 When you run ultrasom.ino the distance (which is measured in cm) is correct and ajdust the empty/full calculations to whatever works best for you.
+
+Each ESP32 must be registered as a `Dispenser` in Django and configured with the
+corresponding `DISPENSER_ID` in `iot/ultrasom.ino`. The current sensor reading
+payload format is:
+
+```json
+{
+  "dispenser_id": 1,
+  "distancia_cm": 10.5
+}
+```
 
 ## Website
 

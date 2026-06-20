@@ -24,32 +24,7 @@ server {
     }
 }
 
-# 2. Redirect do DNS público da EC2 (HTTP)
-server {
-    listen 80;
-    server_name ec2-54-175-178-188.compute-1.amazonaws.com;
-
-    location /.well-known/acme-challenge/ {
-        root /var/www/certbot;
-        allow all;
-        try_files $uri =404;
-    }
-
-    return 301 https://absortech.site$request_uri;
-}
-
-# 3. Redirect do DNS público da EC2 (HTTPS)
-server {
-    listen 443 ssl;
-    server_name ec2-54-175-178-188.compute-1.amazonaws.com;
-
-    ssl_certificate /etc/letsencrypt/live/absortech.site/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/absortech.site/privkey.pem;
-
-    return 301 https://absortech.site$request_uri;
-}
-
-# 4. Servidor principal HTTPS
+# 2. Servidor principal HTTPS
 server {
     listen 443 ssl;
     server_name absortech.site;

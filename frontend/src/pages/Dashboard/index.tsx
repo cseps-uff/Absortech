@@ -5,8 +5,8 @@ export default function Dashboard() {
   return (
     <section className={styles.dashboardSection}>
       <div className={styles.headerBlock}>
-        <h1 className={styles.title}>Contêineres - Prédio de Engenharia</h1>
-        <p className={styles.subtitle}>Monitoramento em tempo real para reposição mais eficiente e previsível.</p>
+        <h1 className={styles.title}>Monitoramento de dispensers</h1>
+        <p className={styles.subtitle}>Estoque e condições operacionais das unidades instaladas, atualizados em tempo real.</p>
       </div>
 
       <div className={styles.statusDiv}>

@@ -5,7 +5,7 @@
 
 #define MINUTES_TO_SLEEP    10
 #define uS_TO_MINUTE_FACTOR 60000000
-#define ANDAR 1
+#define DISPENSER_ID 1
 
 // Configurações de Wi-Fi
 const char* ssid = "nomeWifi";
@@ -41,6 +41,27 @@ void setup_wifi() {
   Serial.println(WiFi.localIP());
 }
 
+// Função de callback do MQTT (não será usada, mas precisa ser declarada)
+void callback(char* topic, byte* message, unsigned int length) {}
+
+// Função para conectar ao servidor MQTT
+void reconnect() {
+  while (!client.connected()) {
+    Serial.print("Tentando conexão MQTT...");
+
+    String clientId = "Absortech-" + String(DISPENSER_ID);
+    if (client.connect(clientId.c_str())) {
+      Serial.println("conectado");
+    } else {
+      Serial.print("falha, rc=");
+      Serial.print(client.state());
+      Serial.println(" tentando novamente em 5 segundos");
+
+      delay(5000);
+    }
+  }
+}
+
 void setup() {
   Serial.begin(115200);
 
@@ -63,10 +84,17 @@ void setup() {
     http.addHeader("Content-Type", "application/json");
 
     // GUARDA AS INFORMAÇÕES NO OBJETO JSON
+<<<<<<< HEAD
     StaticJsonDocument<128> doc;
     doc["measure"] = cmMsec;
     doc["andar"] = ANDAR;
     
+=======
+    doc["dispenser_id"] = DISPENSER_ID;
+    doc["distancia_cm"] = cmMsec;
+
+    // TRANSFORMA O OBJETO JSON EM UMA STRING PARA SER ENVIADA
+>>>>>>> main
     String jsonOutput;
     serializeJson(doc, jsonOutput);
 

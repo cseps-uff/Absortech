@@ -69,7 +69,6 @@ services:
       - ./dockerfiles/configfiles/nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
       - ./dockerfiles/configfiles/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
-      - "80:80"
       - "443:443"
     depends_on:
       - absortech-api
@@ -77,7 +76,6 @@ services:
     networks:
       - absortech-network
     restart: unless-stopped
-
 
 volumes:
   postgres_data:
