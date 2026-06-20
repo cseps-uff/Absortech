@@ -38,7 +38,7 @@ export default function Status() {
   if (!leituras || leituras.length === 0) {
     return (
       <div className={styles.loadingContainer}>
-        <p>Não há dados disponíveis.</p>
+        <p>Nao ha dados disponiveis.</p>
       </div>
     );
   }
@@ -52,7 +52,7 @@ export default function Status() {
         const isAlert = quantidade === null || quantidade <= LIMITE_ALERTA_QUANTIDADE;
         const nivel = Math.min(Math.max(ocupacao ?? 0, 0), 100);
         const quantidadeLabel = quantidade === null
-          ? "Quantidade indisponível"
+          ? "Quantidade indisponivel"
           : `${quantidade} absorvente${quantidade !== 1 ? "s" : ""}`;
 
         return (
@@ -67,12 +67,12 @@ export default function Status() {
               </div>
               <span className={`${styles.badge} ${isAlert ? styles.alertBadge : styles.stableBadge}`}>
                 <span className={styles.badgeDot} aria-hidden="true" />
-                {isAlert ? "Reposição necessária" : "Condição estável"}
+                {isAlert ? "Reposicao necessaria" : "Condicao estavel"}
               </span>
             </header>
 
             <p className={styles.location}>
-              {dispenser.localizacao} · Bloco {dispenser.bloco} · {dispenser.andar}º andar
+              {dispenser.localizacao} - Bloco {dispenser.bloco} - {dispenser.andar}o andar
             </p>
 
             <div className={styles.metrics}>
@@ -81,24 +81,24 @@ export default function Status() {
                 <strong>{quantidadeLabel}</strong>
               </div>
               <div className={styles.metric}>
-                <span className={styles.metricLabel}>Distância</span>
+                <span className={styles.metricLabel}>Distancia</span>
                 <strong>{leitura.distancia_cm.toFixed(1)} cm</strong>
               </div>
               <div className={styles.metric}>
-                <span className={styles.metricLabel}>Última leitura</span>
+                <span className={styles.metricLabel}>Ultima leitura</span>
                 <strong>{dateFormatter.format(new Date(leitura.timestamp))}</strong>
               </div>
             </div>
 
             <div className={styles.levelSection}>
               <div className={styles.levelHeader}>
-                <span>Nível do dispenser</span>
-                <strong>{ocupacao === null ? "Indisponível" : `${ocupacao.toFixed(1)}%`}</strong>
+                <span>Nivel do dispenser</span>
+                <strong>{ocupacao === null ? "Indisponivel" : `${ocupacao.toFixed(1)}%`}</strong>
               </div>
               <div
                 className={styles.levelTrack}
                 role="meter"
-                aria-label={`Nível de ${dispenser.nome}`}
+                aria-label={`Nivel de ${dispenser.nome}`}
                 aria-valuemin={0}
                 aria-valuemax={100}
                 aria-valuenow={nivel}

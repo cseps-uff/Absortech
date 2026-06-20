@@ -1,11 +1,12 @@
+import logging
+
 from django.db.models import OuterRef, Subquery
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
 from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 from .models import LeituraSensor
 from .serializers import LeituraSensorSerializer
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +41,6 @@ def obter_leituras(request):
     except Exception:
         logger.exception("Erro ao buscar leituras")
         return Response(
-            {'error': 'Não foi possível buscar as leituras.'},
+            {'error': 'Nao foi possivel buscar as leituras.'},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )

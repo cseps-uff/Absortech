@@ -14,7 +14,7 @@ class LeituraSensorModelTests(TestCase):
         self.dispenser = Dispenser.objects.create(
             nome='Dispenser principal',
             localizacao='Corredor central',
-            instituicao='Instituição A',
+            instituicao='Instituicao A',
             bloco='A',
             andar=1
         )
@@ -66,14 +66,14 @@ class ObterLeiturasApiTests(TestCase):
         self.dispenser = Dispenser.objects.create(
             nome='Dispenser principal',
             localizacao='Corredor central',
-            instituicao='Instituição A',
+            instituicao='Instituicao A',
             bloco='A',
             andar=1
         )
         self.inativo = Dispenser.objects.create(
             nome='Dispenser inativo',
             localizacao='Almoxarifado',
-            instituicao='Instituição A',
+            instituicao='Instituicao A',
             bloco='B',
             andar=2,
             ativo=False

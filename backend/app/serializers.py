@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import LeituraSensor, Dispenser
 
+
 class DispenserSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dispenser
@@ -14,6 +15,7 @@ class DispenserSerializer(serializers.ModelSerializer):
             'ativo',
             'created_at'
         ]
+
 
 class LeituraSensorSerializer(serializers.ModelSerializer):
     dispenser = DispenserSerializer(read_only=True)

@@ -12,6 +12,9 @@ venv/
 env/
 ENV/
 
+# Env file
+.env
+
 # Database
 *.sqlite3
 /mqtt/mosquitto/data/
@@ -21,9 +24,6 @@ staticfiles/
 
 # Media files (uploads, etc.)
 media/
-
-# Django secret key and environment variables
-.env
 
 # Pytest cache
 .pytest_cache/

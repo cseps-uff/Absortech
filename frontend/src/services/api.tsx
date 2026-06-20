@@ -50,13 +50,13 @@ export const fetchLeituras = async (): Promise<Leitura[]> => {
     try {
         const response = await api.get<LeituraApi[]>("/leituras/");
         if (!Array.isArray(response.data)) {
-            throw new Error("Formato de resposta inválido");
+            throw new Error("Formato de resposta invalido");
         }
 
         return response.data.map((leitura) => {
             const distancia = parseDecimal(leitura.distancia_cm);
             if (distancia === null) {
-                throw new Error(`Distância inválida na leitura ${leitura.id}`);
+                throw new Error(`Distancia invalida na leitura ${leitura.id}`);
             }
 
             return {

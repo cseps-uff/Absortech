@@ -25,7 +25,7 @@ class Dispenser(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.nome} - {self.instituicao} (Bloco {self.bloco}, {self.andar}º Andar)"
+        return f"{self.nome} - {self.instituicao} (Bloco {self.bloco}, {self.andar}o Andar)"
 
 
 class LeituraSensor(models.Model):
@@ -36,7 +36,7 @@ class LeituraSensor(models.Model):
     dispenser = models.ForeignKey(
         Dispenser,
         on_delete=models.PROTECT,
-        related_name='leituras',
+        related_name='leituras'
     )
     timestamp = models.DateTimeField(default=timezone.now)
     distancia_cm = models.DecimalField(
@@ -115,7 +115,7 @@ class LeituraSensor(models.Model):
         if kwargs.get('update_fields') is not None:
             kwargs['update_fields'] = set(kwargs['update_fields']) | {
                 'quantidade_estimada',
-                'porcentagem_ocupacao',
+                'porcentagem_ocupacao'
             }
 
         super().save(*args, **kwargs)

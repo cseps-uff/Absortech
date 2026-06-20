@@ -18,7 +18,7 @@ def _calcular_dados_processados(distancia):
     distancia = Decimal(str(distancia))
     distancia_limitada = min(
         max(distancia, DISTANCIA_CHEIO_CM),
-        DISTANCIA_VAZIO_CM,
+        DISTANCIA_VAZIO_CM
     )
     porcentagem = (
         (DISTANCIA_VAZIO_CM - distancia_limitada)
@@ -45,7 +45,7 @@ def _colunas(schema_editor, tabela):
     with schema_editor.connection.cursor() as cursor:
         descricao = schema_editor.connection.introspection.get_table_description(
             cursor,
-            tabela,
+            tabela
         )
     return {coluna.name for coluna in descricao}
 
@@ -75,7 +75,7 @@ def atualizar_schema_legado(apps, schema_editor):
         'distancia_cm': 'numeric(6, 2)',
         'quantidade_estimada': 'integer',
         'porcentagem_ocupacao': 'numeric(5, 2)',
-        'dispenser_id': 'bigint',
+        'dispenser_id': 'bigint'
     }
     for nome, tipo in novas_colunas.items():
         if nome not in colunas:
@@ -113,9 +113,9 @@ def atualizar_schema_legado(apps, schema_editor):
                         [
                             f'Dispenser legado - {andar_original}',
                             f'Andar {andar_original}',
-                            'Não informada',
-                            'Não informado',
-                            andar,
+                            'Nao informada',
+                            'Nao informado',
+                            andar
                         ],
                     )
                     dispenser_id = cursor.fetchone()[0]
@@ -124,7 +124,6 @@ def atualizar_schema_legado(apps, schema_editor):
             timestamp = datetime.combine(data, hora)
             if timezone.is_naive(timestamp):
                 timestamp = timezone.make_aware(timestamp, timezone.get_default_timezone())
-            # O campo antigo era descrito como leitura do sensor em centímetros.
             quantidade, porcentagem = _calcular_dados_processados(valor)
 
             with schema_editor.connection.cursor() as cursor:
@@ -144,7 +143,7 @@ def atualizar_schema_legado(apps, schema_editor):
                         quantidade,
                         porcentagem,
                         dispenser_id,
-                        leitura_id,
+                        leitura_id
                     ],
                 )
 
@@ -169,11 +168,11 @@ def atualizar_schema_legado(apps, schema_editor):
                 RETURNING id
                 """,
                 [
-                    'Dispenser legado sem identificação',
-                    'Não informada',
-                    'Não informada',
-                    'Não informado',
-                    0,
+                    'Dispenser legado sem identificacao',
+                    'Nao informada',
+                    'Nao informada',
+                    'Nao informado',
+                    0
                 ],
             )
             dispenser_id = cursor.fetchone()[0]
@@ -183,7 +182,7 @@ def atualizar_schema_legado(apps, schema_editor):
                 SET dispenser_id = %s
                 WHERE dispenser_id IS NULL
                 """,
-                [dispenser_id],
+                [dispenser_id]
             )
 
     schema_editor.execute(
@@ -230,7 +229,7 @@ def atualizar_schema_legado(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('app', '0001_initial'),
+        ('app', '0001_initial')
     ]
 
     operations = [
@@ -238,7 +237,7 @@ class Migration(migrations.Migration):
             database_operations=[
                 migrations.RunPython(
                     atualizar_schema_legado,
-                ),
+                )
             ],
             state_operations=[
                 migrations.CreateModel(
@@ -250,8 +249,8 @@ class Migration(migrations.Migration):
                                 auto_created=True,
                                 primary_key=True,
                                 serialize=False,
-                                verbose_name='ID',
-                            ),
+                                verbose_name='ID'
+                            )
                         ),
                         ('nome', models.CharField(max_length=100)),
                         ('localizacao', models.CharField(max_length=255)),
@@ -259,16 +258,16 @@ class Migration(migrations.Migration):
                         ('bloco', models.CharField(max_length=50)),
                         ('andar', models.IntegerField()),
                         ('ativo', models.BooleanField(default=True)),
-                        ('created_at', models.DateTimeField(auto_now_add=True)),
+                        ('created_at', models.DateTimeField(auto_now_add=True))
                     ],
                     options={
-                        'ordering': ['instituicao', 'bloco', 'andar', 'nome'],
-                    },
+                        'ordering': ['instituicao', 'bloco', 'andar', 'nome']
+                    }
                 ),
                 migrations.AddField(
                     model_name='leiturasensor',
                     name='timestamp',
-                    field=models.DateTimeField(default=timezone.now),
+                    field=models.DateTimeField(default=timezone.now)
                 ),
                 migrations.AddField(
                     model_name='leiturasensor',
@@ -278,8 +277,8 @@ class Migration(migrations.Migration):
                         max_digits=6,
                         validators=[
                             django.core.validators.MinValueValidator(Decimal('0'))
-                        ],
-                    ),
+                        ]
+                    )
                 ),
                 migrations.AddField(
                     model_name='leiturasensor',
@@ -288,8 +287,8 @@ class Migration(migrations.Migration):
                         blank=True,
                         editable=False,
                         null=True,
-                        validators=[django.core.validators.MinValueValidator(0)],
-                    ),
+                        validators=[django.core.validators.MinValueValidator(0)]
+                    )
                 ),
                 migrations.AddField(
                     model_name='leiturasensor',
@@ -302,9 +301,9 @@ class Migration(migrations.Migration):
                         null=True,
                         validators=[
                             django.core.validators.MinValueValidator(Decimal('0')),
-                            django.core.validators.MaxValueValidator(Decimal('100')),
-                        ],
-                    ),
+                            django.core.validators.MaxValueValidator(Decimal('100'))
+                        ]
+                    )
                 ),
                 migrations.AddField(
                     model_name='leiturasensor',
@@ -312,66 +311,66 @@ class Migration(migrations.Migration):
                     field=models.ForeignKey(
                         on_delete=django.db.models.deletion.PROTECT,
                         related_name='leituras',
-                        to='app.dispenser',
-                    ),
+                        to='app.dispenser'
+                    )
                 ),
                 migrations.RemoveField(
                     model_name='leiturasensor',
-                    name='andar',
+                    name='andar'
                 ),
                 migrations.RemoveField(
                     model_name='leiturasensor',
-                    name='data',
+                    name='data'
                 ),
                 migrations.RemoveField(
                     model_name='leiturasensor',
-                    name='hora',
+                    name='hora'
                 ),
                 migrations.RemoveField(
                     model_name='leiturasensor',
-                    name='valor_leitura',
+                    name='valor_leitura'
                 ),
                 migrations.AlterModelOptions(
                     name='leiturasensor',
-                    options={'ordering': ['-timestamp', '-id']},
-                ),
+                    options={'ordering': ['-timestamp', '-id']}
+                )
             ],
         ),
         migrations.AddIndex(
             model_name='dispenser',
             index=models.Index(
                 fields=['instituicao', 'bloco', 'andar'],
-                name='dispenser_location_idx',
-            ),
+                name='dispenser_location_idx'
+            )
         ),
         migrations.AddIndex(
             model_name='leiturasensor',
             index=models.Index(
                 fields=['timestamp'],
-                name='leitura_timestamp_idx',
-            ),
+                name='leitura_timestamp_idx'
+            )
         ),
         migrations.AddIndex(
             model_name='leiturasensor',
             index=models.Index(
                 fields=['dispenser', '-timestamp'],
-                name='leitura_disp_ts_idx',
-            ),
+                name='leitura_disp_ts_idx'
+            )
         ),
         migrations.AddConstraint(
             model_name='leiturasensor',
             constraint=models.CheckConstraint(
                 condition=Q(distancia_cm__gte=0),
-                name='leitura_distancia_nonneg',
-            ),
+                name='leitura_distancia_nonneg'
+            )
         ),
         migrations.AddConstraint(
             model_name='leiturasensor',
             constraint=models.CheckConstraint(
                 condition=Q(quantidade_estimada__isnull=True)
                 | Q(quantidade_estimada__gte=0),
-                name='leitura_quantidade_nonneg',
-            ),
+                name='leitura_quantidade_nonneg'
+            )
         ),
         migrations.AddConstraint(
             model_name='leiturasensor',
@@ -379,9 +378,9 @@ class Migration(migrations.Migration):
                 condition=Q(porcentagem_ocupacao__isnull=True)
                 | Q(
                     porcentagem_ocupacao__gte=0,
-                    porcentagem_ocupacao__lte=100,
+                    porcentagem_ocupacao__lte=100
                 ),
-                name='leitura_ocupacao_range',
-            ),
-        ),
+                name='leitura_ocupacao_range'
+            )
+        )
     ]
